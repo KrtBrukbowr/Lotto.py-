@@ -1,0 +1,169 @@
+""" 
+Author: Kurt Bruckbauer
+Program: mylotto.py
+Date: 5/1/20
+
+Summary: 
+WA170 Final Project II:
+Lottery Number Generator
+Create a Python GUI-based application that acts as a lottery number generator.
+TODO This app should contain a title WITHIN the GUI which reads "Lottery Number Generator" or SOMETHING of that sort.
+TODO You will need components for the winning numbers to be placed once the function that generates them is triggered.  
+TODO You will also of course need a command button to trigger the function that generates and displays the numbers.
+TODO Base the numbers on the NY PowerBall lottery which is FIVE individual numbers with the range from 1 to 69. And then a PowerBall number which is only from 1 to 26.  Each click of the command button should generate a new series of numbers.
+Grading Levels:
+Level A : GUI contains all required components, is nicely styled and designed. Application works as described above.
+
+"""
+from breezypythongui import EasyFrame
+from tkinter.font import Font
+from datetime import date
+import tkinter.filedialog
+import random
+
+class MyLotto(EasyFrame):
+
+    def __init__(self):
+        #   Sets up window & Title display & Color
+        EasyFrame.__init__(self, title="My Lottery Program",background="Light Gray")
+
+
+        #   Add Header & Background Color
+        myFont = Font(family="sans serif", size=20, weight="bold",slant="italic")
+        myFont2 = Font(family="sans serif", size=10, weight="bold",slant="italic")
+        self.header = self.addLabel(text="LOTTO.py", row=0, column=0,background="Light Gray",sticky="NSEW",foreground="Midnight Blue",font=myFont)
+        self.direction = self.addLabel(text="Fill out ticket info and Click the Play Button OR press ENTER", row=1, column=0, background="Light Gray", foreground="Indian Red",font=myFont2)
+        
+        #  TODO Add Menu Bar to GUI
+        """ 
+        menuBar = self.addMenuBar(row=0, column=2, orient="horizontal")
+        gameMenu = menuBar.addMenu(text="LOTTO Games")
+         """
+        
+        
+        
+       
+        #   Add First Name Panel
+        self.firstNamePanel = self.addPanel(row=2, column=0,background="Light Gray")
+        self.firstNamePanel.addLabel(text="First Name", row=2, column=0,background="Light Gray",foreground="Midnight Blue",font=myFont2)
+        self.firstName = self.firstNamePanel.addTextField(text="", row=2, column=1)
+        self.firstName.focus()
+
+        #   Add Last Name Panel
+        self.lastNamePanel = self.addPanel(row=3, column=0,background="Light Gray")
+        self.lastNamePanel.addLabel(text="Last Name", row=3, column=0, background="Light Gray",foreground="Midnight Blue",font=myFont2)
+        self.lastName= self.lastNamePanel.addTextField(text="", row=3, column=1)
+
+        #   How many tix 
+        self.addLabel(text="How Many Tix", row=4, column=0,background="Light Gray", foreground="Midnight Blue",font=myFont2)
+        self.howManyTix = self.addIntegerField(1, column=0, row=4)
+
+        # Add Button Panel
+        self.btnPanel = self.addPanel(row=5,column=0,columnspan=4,background="Light Gray")
+        self.playBtn = self.btnPanel.addButton(text="Play", row=5, column=1, command=self.play)
+        self.lastName.bind("<Return>", lambda event: self.play())
+        self.clearBtn = self.btnPanel.addButton(text="Clear", row=5, column=2,command=self.clear,state="disabled")
+    
+        #   Add GUI component to display LOTTO receipt
+        self.displayLOTTO = self.addTextArea("", row=7, column=0, columnspan=2,width=50,height=15)
+        
+
+    #   Event handling for Clear() Button
+    def clear(self):  # Resets Input Fields to empty string and updates state of the buttons
+        self.lastName.unbind("<Return>")
+        self.lastName.bind("<Return>", lambda event:self.play())
+        text = ""
+        msg = "Fill out ticket info and Click the Play Button OR press ENTER"
+        self.direction["text"] = text
+        self.direction["text"] = msg       
+        self.firstName.setText(text)
+        self.firstName.focus()
+        self.lastName.setText(text)
+        
+        self.displayLOTTO["state"] = "normal"
+        self.displayLOTTO.setText(text)
+        self.displayLOTTO["state"] = "disabled"
+
+        
+        self.playBtn["state"] = "normal"
+
+    #   Event handling for Play() Button
+    def play(self):          
+
+        self.lastName.unbind("<Return>")
+        self.lastName.bind("<Return>", lambda event: self.clear())
+        text = ""
+        msg = "To reset ticket info click Clear OR press ENTER"
+        self.direction["text"] = text
+        self.direction["text"] = msg
+        # Generates 5 Lotto #'s & PwrBall # & display receipt of Lotto Play
+        
+        self.clearBtn["state"] = "normal"
+        self.playBtn["state"] = "disabled"
+
+        # Initialize variables & Obtain Input from Input fields
+            
+        today = date.today()   # Date for ticket
+        tcktDate = today.strftime("%d/%m/%Y")  # Format Date
+        nameFirst = self.firstName.getText()
+        nameLast = self.lastName.getText()
+        nameFull = nameFirst + " " + nameLast
+        howX = self.howManyTix.getNumber()
+
+        #*** TODO *** Validate input field isnt empty does not work yet
+        try:
+            # LOTTO #'s        
+            num1 = random.randint(1, 69)  # Variable to create random  LOTTO #1 (1-69)
+            num2 = random.randint(1, 69)  # Variable to create random  LOTTO #2 (1-69)
+            num3 = random.randint(1, 69)  # Variable to create random  LOTTO #3 (1-69)
+            num4 = random.randint(1, 69)  # Variable to create random  LOTTO #4 (1-69)
+            num5 = random.randint(1, 69)  # Variable to create random  LOTTO #5 (1-69)
+            pwrBall= random.randint(1, 26)# Variable to create random PWRBALL # (1-26)
+        except self.nameFirst == " " or self.nameLast == " ":
+            self.messageBox(title="ERROR", message="Please provide your First and Last name. OR ELSE...")
+                
+    
+          
+        # Name, Date & LOTTO #'S for Lotto ticket
+        lottoTckt = "%30s\n\n\n\n\n%-18s\n%10s\n\n\n%8s%3d%3d%3d%3d%3d\n%-13s%-3d" % ("LOTTO.PY", nameFull, tcktDate, "LOTTO #:", num1, num2, num3, num4, num5, "PowerBall #: ", pwrBall)
+        
+        # Output result to GUI & preserve read only State
+        self.displayLOTTO["state"] = "normal"
+        self.displayLOTTO.setText(lottoTckt)
+        self.displayLOTTO["state"] = "disabled"
+        
+                    
+      
+    
+def main():
+    MyLotto().mainloop()
+
+main()
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+
+
+
+
+
+
